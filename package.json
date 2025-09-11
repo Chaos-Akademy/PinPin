@@ -1,0 +1,20 @@
+{
+  "name": "pinpin",
+  "version": "1.0.0",
+  "description": "DisneyPinnacle NFT marketplace monitor",
+  "main": "dist/marketplace-monitor.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/marketplace-monitor.js",
+    "dev": "ts-node src/marketplace-monitor.ts"
+  },
+  "dependencies": {
+    "@onflow/fcl": "^1.9.0",
+    "@onflow/types": "^1.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.11.0"
+  }
+}
