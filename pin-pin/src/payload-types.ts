@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     users: User;
     pins: Pin;
+    marketplaceEvents: MarketplaceEvent;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -90,6 +91,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     pins: PinsSelect<false> | PinsSelect<true>;
+    marketplaceEvents: MarketplaceEventsSelect<false> | MarketplaceEventsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -758,6 +760,26 @@ export interface Pin {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marketplaceEvents".
+ */
+export interface MarketplaceEvent {
+  id: string;
+  pin: string | Pin;
+  transactionID: string;
+  eventType?: ('buy' | 'sell' | 'listing' | 'unlisting' | 'trade') | null;
+  price?: number | null;
+  seller?: string | null;
+  buyer?: string | null;
+  alertMedium: {
+    email?: boolean | null;
+    discord?: boolean | null;
+    telegram?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -952,6 +974,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pins';
         value: string | Pin;
+      } | null)
+    | ({
+        relationTo: 'marketplaceEvents';
+        value: string | MarketplaceEvent;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1335,6 +1361,27 @@ export interface PinsSelect<T extends boolean = true> {
   editionID?: T;
   title?: T;
   belowPrice?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marketplaceEvents_select".
+ */
+export interface MarketplaceEventsSelect<T extends boolean = true> {
+  pin?: T;
+  transactionID?: T;
+  eventType?: T;
+  price?: T;
+  seller?: T;
+  buyer?: T;
+  alertMedium?:
+    | T
+    | {
+        email?: T;
+        discord?: T;
+        telegram?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

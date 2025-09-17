@@ -11,8 +11,8 @@ export const Pins: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['editionID'],
-    useAsTitle: 'editionID',
+    defaultColumns: ['title'],
+    useAsTitle: 'title',
   },
   fields: [
     {
