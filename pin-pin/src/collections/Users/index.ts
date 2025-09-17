@@ -20,6 +20,51 @@ export const Users: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
+      required: true,
+    },
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+    },
+    {
+      name:'plan',
+      type:'select',
+      options:[
+        {
+          label:'Free',
+          value:'free',
+        },
+        {
+          label:'Storyborn',
+          value:'storyborn',
+        },
+        {
+          label:'Dreamborn',
+          value:'dreamborn',
+        },
+      ],
+    },
+    {
+      name:'notificationsPreferences',
+      type:'group',
+      fields:[
+        {
+          name:'email',
+          type:'checkbox',
+          defaultValue:true,
+        },
+        {
+          name:'discord',
+          type:'checkbox',
+          defaultValue:false,
+        },
+        {
+          name:'telegram',
+          type:'checkbox',
+          defaultValue:false,
+        }
+      ],
     },
   ],
   timestamps: true,
