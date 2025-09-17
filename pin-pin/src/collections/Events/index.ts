@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 
-export const Events: CollectionConfig = {
+export const MarketplaceEvents: CollectionConfig = {
   slug: 'marketplaceEvents',
   access: {
     create: authenticated,
