@@ -14,9 +14,9 @@ access(all) contract PinPin {
             // Get PinPin's Flow vault ref
             let pinPinVault = getAccount(PinPin.account.address).capabilities.borrow<&FlowToken.Vault>(/public/flowTokenReceiver)!
             // Get a reference to the vaultCap
-            let ref = self.vaultCap
+            let ref = self.vaultCap.borrow()!
             // Deposit 0.1 Flow on the PinPin account
-            pinPinVault.deposit(from: <- self.vaultCap.withdraw(amount: 0.1))
+            pinPinVault.deposit(from: <- ref.withdraw(amount: 0.1))
             log("Account /self.owner!.address has made a deposit for a subscription")
 
             // Determine delay for the next transaction (default 3 seconds if none provided)

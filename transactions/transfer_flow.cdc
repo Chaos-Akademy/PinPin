@@ -24,7 +24,7 @@ transaction(amount: UFix64, to: Address) {
                 .concat(" contract needs to implement the FTVaultData Metadata view in order to execute this transaction."))
 
         // Get a reference to the signer's stored vault
-        let vaultRef = signer.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: self.vaultData.storagePath)
+        let vaultRef: auth(FungibleToken.Withdraw) &FlowToken.Vault = signer.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: self.vaultData.storagePath)
             ?? panic("The signer does not store an FlowToken.Vault object at the path "
                     .concat(self.vaultData.storagePath.toString())
                     .concat(". The signer must initialize their account with this vault first!"))

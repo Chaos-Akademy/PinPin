@@ -1,4 +1,7 @@
 {
+	"contracts": {
+		"PinPin": "./contracts/PinPin.cdc"
+	},
 	"dependencies": {
 		"Burner": {
 			"source": "testnet://9a0766d93b6608b7.Burner",
@@ -104,6 +107,20 @@
 				"type": "file",
 				"location": "emulator-account.pkey"
 			}
+		},
+		"pinpin": {
+			"address": "f06ca172792b6627",
+			"key": {
+				"type": "file",
+				"location": "pinpin.pkey"
+			}
+		}
+	},
+	"deployments": {
+		"testnet": {
+			"pinpin" : [
+				"PinPin"
+			]
 		}
 	}
 }

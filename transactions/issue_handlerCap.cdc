@@ -12,7 +12,7 @@ transaction() {
 
     prepare(signer: auth(IssueStorageCapabilityController) &Account) {
 
-        let cap= signer.capabilities.storage.issue<auth(FungibleToken.Withdraw) &FlowToken>(/storage/flowToken)
+        let cap: Capability<auth(FungibleToken.Withdraw) &FlowToken> = signer.capabilities.storage.issue<auth(FungibleToken.Withdraw) &FlowToken>(/storage/flowToken)
 
     }
 }
