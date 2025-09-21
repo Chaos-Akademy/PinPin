@@ -7,14 +7,16 @@ access(all) contract PinPin {
     /// Handler resource that implements the Scheduled Transaction interface
     access(all) resource Handler: FlowTransactionScheduler.TransactionHandler {
 
-        access(self) var vaultRef: auth(FungibleToken.Withdraw) &FlowToken.Vault
+        access(self) var vaultCap: Capability<auth(FungibleToken.Withdraw) &FlowToken>
 
         access(FlowTransactionScheduler.Execute) fun executeTransaction(id: UInt64, data: AnyStruct?) {
             // let storage = self.owner!.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowToken)
             // Get PinPin's Flow vault ref
             let pinPinVault = getAccount(PinPin.account.address).capabilities.borrow<&FlowToken.Vault>(/public/flowTokenReceiver)!
+            // Get a reference to the vaultCap
+            let ref = self.vaultCap
             // Deposit 0.1 Flow on the PinPin account
-            pinPinVault.deposit(from: <- self.vaultRef.withdraw(amount: 0.1))
+            pinPinVault.deposit(from: <- self.vaultCap.withdraw(amount: 0.1))
             log("Account /self.owner!.address has made a deposit for a subscription")
 
             // Determine delay for the next transaction (default 3 seconds if none provided)
@@ -44,18 +46,18 @@ access(all) contract PinPin {
 
             // Ensure a handler resource exists in the contract account storage
             if PinPin.account.storage.borrow<&AnyResource>(from: /storage/PinPin) == nil {
-                let handler <- PinPin.createHandler()
+                let handler <- PinPin.createHandler(cap: self.vaultCap) 
                 PinPin.account.storage.save(<-handler, to: /storage/PinPin)
             }  
         }
 
-        init(_ cap: auth(FungibleToken.Withdraw) &FlowToken.Vault) {
-            self.vaultRef = cap
+        init(_ cap: Capability<auth(FungibleToken.Withdraw) &FlowToken>) {
+            self.vaultCap = cap
         }
     }
 
     /// Factory for the handler resource
-    access(all) fun createHandler(cap: auth(FungibleToken.Withdraw) &FlowToken.Vault): @Handler {
+    access(all) fun createHandler(cap: Capability<auth(FungibleToken.Withdraw) &FlowToken>): @Handler {
         return <- create Handler(cap)
     }
 
