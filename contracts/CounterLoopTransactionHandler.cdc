@@ -1,15 +1,15 @@
 import "FlowTransactionScheduler"
 import "FlowToken"
 import "FungibleToken"
-import "Counter"
+// import "Counter"
 
 access(all) contract CounterLoopTransactionHandler {
 
     /// Handler resource that implements the Scheduled Transaction interface
     access(all) resource Handler: FlowTransactionScheduler.TransactionHandler {
         access(FlowTransactionScheduler.Execute) fun executeTransaction(id: UInt64, data: AnyStruct?) {
-            Counter.increment()
-            let newCount = Counter.getCount()
+            // Counter.increment()
+            let newCount = 1
             log("Transaction executed (id: ".concat(id.toString()).concat(") newCount: ").concat(newCount.toString()))
 
             // Determine delay for the next transaction (default 3 seconds if none provided)
