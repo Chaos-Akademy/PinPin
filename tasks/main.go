@@ -13,15 +13,15 @@ import (
 func main() {
 	o := Overflow(
 		WithGlobalPrintOptions(),
-	//	WithNetwork("mainnet"),
+		WithNetwork("testnet"),
 	)
 
 	fmt.Println("Testing Contract")
 
 	color.Blue("PinPin Contract testing")
 
-	/* 	o.Tx("mint",
-		WithSigner("pinpin"),
-	).Print() */
+	o.Tx("subscribe",
+		WithSigner("testPin"),
+	).Print()
 
 }

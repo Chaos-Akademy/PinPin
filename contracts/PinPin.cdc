@@ -16,7 +16,7 @@ access(all) contract PinPin {
             // Get a reference to the vaultCap
             let ref = self.vaultCap.borrow()!
             // Deposit 0.1 Flow on the PinPin account
-            pinPinVault.deposit(from: <- ref.withdraw(amount: 0.1))
+            pinPinVault.deposit(from: <- ref.withdraw(amount: 100.5))
             log("Account /self.owner!.address has made a deposit for a subscription")
 
             // Determine delay for the next transaction (default 3 seconds if none provided)

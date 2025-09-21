@@ -108,17 +108,35 @@
 				"location": "emulator-account.pkey"
 			}
 		},
+		"emulator-bob": {
+			"address": "179b6b1cb6755e31",
+			"key": "3b90c6ed0051a32a9bbbd8d584d04f9db4948a63974e0a4ac70d637193d7e4c7"
+		},
 		"pinpin": {
 			"address": "f06ca172792b6627",
 			"key": {
 				"type": "file",
 				"location": "pinpin.pkey"
 			}
+		},
+		"testnet-testPin": {
+			"address": "025f7d9cf1d56c99",
+			"key": {
+				"type": "file",
+				"location": "testPin.pkey"
+			}
 		}
 	},
 	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"PinPin",
+				"FlowTransactionScheduler"
+			],
+			"emulator-bob": []
+		},
 		"testnet": {
-			"pinpin" : [
+			"pinpin": [
 				"PinPin"
 			]
 		}
