@@ -31,4 +31,10 @@ func main() {
 		WithArg("executionEffort", "1000"),
 		WithArg("transactionData", ``),
 	).Print()
+
+	/*
+		 	o.Tx("removeHandler",
+				WithSigner("testPin"),
+			).Print()
+	*/
 }
