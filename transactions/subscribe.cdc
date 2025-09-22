@@ -14,7 +14,7 @@ transaction() {
         }
 
         // Validation/example that we can create an issue a handler capability with correct entitlement for FlowTransactionScheduler
-/*         let _ = signer.capabilities.storage
-            .issue<auth(FlowTransactionScheduler.Execute) &{FlowTransactionScheduler.TransactionHandler}>(/storage/PinPin) */
+        let _ = signer.capabilities.storage
+            .issue<auth(FlowTransactionScheduler.Execute) &{FlowTransactionScheduler.TransactionHandler}>(/storage/PinPin)
     }
 }

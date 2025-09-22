@@ -3,6 +3,9 @@ import "FlowToken"
 import "FungibleToken"
 
 access(all) contract PinPin {
+    // Events
+    access(all) event ContractInitialized()
+    access(all) event SubscriptionActivated(subscriber: Address)
 
     /// Handler resource that implements the Scheduled Transaction interface
     access(all) resource Handler: FlowTransactionScheduler.TransactionHandler {
@@ -11,14 +14,16 @@ access(all) contract PinPin {
 
         access(FlowTransactionScheduler.Execute) fun executeTransaction(id: UInt64, data: AnyStruct?) {
             // let storage = self.owner!.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowToken)
+            // Get the PinPin account
+            let account = getAccount(PinPin.account.address)
             // Get PinPin's Flow vault ref
-            let pinPinVault = getAccount(PinPin.account.address).capabilities.borrow<&FlowToken.Vault>(/public/flowTokenReceiver)!
+            let pinPinVault = account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
             // Get a reference to the vaultCap
             let ref = self.vaultCap.borrow()!
             // Deposit 0.1 Flow on the PinPin account
-            pinPinVault.deposit(from: <- ref.withdraw(amount: 100.5))
+            pinPinVault.deposit(from: <- ref.withdraw(amount: 100.5)) 
             log("Account /self.owner!.address has made a deposit for a subscription")
-
+            emit SubscriptionActivated(subscriber: self.owner!.address)
             // Determine delay for the next transaction (default 3 seconds if none provided)
             var delay: UFix64 = 5.0
             if data != nil {
@@ -82,7 +87,7 @@ access(all) contract PinPin {
     }
 
     init() {
-        // Deposit a Cap to the vault that's going to pay for the transactions
 
+        emit ContractInitialized()
     }
 }
