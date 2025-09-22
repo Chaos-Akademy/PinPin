@@ -20,9 +20,9 @@ func main() {
 
 	color.Blue("PinPin Contract testing")
 
-	/* 	o.Tx("subscribe",
+	o.Tx("subscribe",
 		WithSigner("testPin"),
-	).Print() */
+	).Print()
 
 	o.Tx("startLoop",
 		WithSigner("testPin"),
