@@ -3,6 +3,11 @@ import "FlowToken"
 import "FungibleToken"
 
 access(all) contract PinPin {
+    // -----------------------------------------------------------------------
+    // PinPin contract-level fields.
+    // These contain actual values that are stored in the smart contract.
+    // -----------------------------------------------------------------------
+    access(all) var subscriptionFee: UFix64
     // Events
     access(all) event ContractInitialized()
     access(all) event SubscriptionActivated(subscriber: Address)
@@ -10,13 +15,13 @@ access(all) contract PinPin {
     /// Handler resource that implements the Scheduled Transaction interface
     access(all) resource Handler: FlowTransactionScheduler.TransactionHandler {
 
-        access(self) var vaultCap: Capability<auth(FungibleToken.Withdraw) &FlowToken.Vault>
+        access(self) var vault: @FlowToken.Vault
 
         access(FlowTransactionScheduler.Execute) fun executeTransaction(id: UInt64, data: AnyStruct?) {
             // Get PinPin's Flow vault ref
             let pinPinVault = PinPin.account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
             // Get a reference to the vaultCap
-            let ref = self.vaultCap.borrow()!
+            let ref <- self.vault.withdraw(amount: 0.1)
             // Deposit 0 Flow on the PinPin account
             pinPinVault.deposit(from: <- ref.withdraw(amount: 0.01)) 
             log("Account /self.owner!.address has made a deposit for a subscription")
@@ -46,12 +51,6 @@ access(all) contract PinPin {
                 message: estimate.error ?? "estimation failed"
             )   
 
-            // Ensure a handler resource exists in the contract account storage
-            if PinPin.account.storage.borrow<&AnyResource>(from: /storage/PinPin) == nil {
-                let handler <- PinPin.createHandler(cap: self.vaultCap) 
-                PinPin.account.storage.save(<-handler, to: /storage/PinPin)
-            }  
-
             // Withdraw FLOW fees from this resource's ownner account vault
             let fees <- ref.withdraw(amount: estimate.flowFee ?? 0.0) as! @FlowToken.Vault   
 
@@ -73,18 +72,22 @@ access(all) contract PinPin {
             destroy receipt
         }
 
-        init(_ cap: Capability<auth(FungibleToken.Withdraw) &FlowToken.Vault>) {
-            self.vaultCap = cap
+        init(_ vault: @FlowToken.Vault,_ consentedFee: UFix64,_ consentedCycles: UFix64) {
+            pre {
+                PinPin.subscriptionFee == consentedFee: "Consented fee must be equal to contract's current fee"
+                vault.balance >= consentedCycles * consentedFee: "Vault's balance must be equal or greater than Fees x Cycles"
+            }
+            self.vault <- vault
         }
     }
 
     /// Factory for the handler resource
-    access(all) fun createHandler(cap: Capability<auth(FungibleToken.Withdraw) &FlowToken.Vault>): @Handler {
-        return <- create Handler(cap)
+    access(all) fun createHandler(vault: @FlowToken.Vault, consentedFee: UFix64, consentedCycles: UFix64): @Handler {
+        return <- create Handler(<- vault, consentedFee, consentedCycles)
     }
 
     init() {
-
+        self.subscriptionFee = 0.1
         emit ContractInitialized()
     }
 }
