@@ -17,12 +17,12 @@ access(all) contract PinPin {
             let pinPinVault = PinPin.account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
             // Get a reference to the vaultCap
             let ref = self.vaultCap.borrow()!
-            // Deposit 100 Flow on the PinPin account
-            pinPinVault.deposit(from: <- ref.withdraw(amount: 100.0)) 
+            // Deposit 0 Flow on the PinPin account
+            pinPinVault.deposit(from: <- ref.withdraw(amount: 0.01)) 
             log("Account /self.owner!.address has made a deposit for a subscription")
             emit SubscriptionActivated(subscriber: self.owner!.address)
             // Determine delay for the next transaction (default 3 seconds if none provided)
-            var delay: UFix64 = 5.0
+            var delay: UFix64 = 60.0
             if data != nil {
                 let t = data!.getType()
                 if t.isSubtype(of: Type<UFix64>()) {
