@@ -8,11 +8,40 @@ access(all) contract PinPin {
     // These contain actual values that are stored in the smart contract.
     // -----------------------------------------------------------------------
     access(all) var subscriptionFee: UFix64
-    access(self) var activeSubscriptions: {Address: }
+
     // Events
     access(all) event ContractInitialized()
     access(all) event SubscriptionActivated(subscriber: Address)
+    // -----------------------------------------------------------------------
+    // PinPin account paths
+    // -----------------------------------------------------------------------
+  
+    access(all) let SubscriptionStoragePath: StoragePath
+    access(all) let SubscriptionPublicPath: PublicPath
+    access(all) let handlerStoragePath: StoragePath
 
+    // access(all) let feeVaultStoragePath: StoragePath
+    // access(all) let receiptsStoragePath: StoragePath
+
+    // -----------------------------------------------------------------------
+    // PinPin contract-level Composite Type definitions
+    // -----------------------------------------------------------------------
+    access(all) resource Subscription {
+        access(all) let subscriber: Address
+        access(all) let fee: UFix64
+        access(all) let cycles: UFix64
+        access(all) let startedAt: UFix64
+        access(all) let expiresAt: UFix64
+
+        init(subscriber: Address, fee: UFix64, cycles: UFix64, startedAt: UFix64, expiresAt: UFix64) {
+            self.subscriber = subscriber
+            self.fee = fee
+            self.cycles = cycles
+            self.startedAt = startedAt
+            self.expiresAt = expiresAt
+        }
+    }
+    // -----------------------------------------------------------------------
     /// Handler resource that implements the Scheduled Transaction interface
     access(all) resource Handler: FlowTransactionScheduler.TransactionHandler {
 
@@ -91,6 +120,12 @@ access(all) contract PinPin {
 
     init() {
         self.subscriptionFee = 0.1
+
+        // Set the named paths
+        let identifier = "PinPin_".concat(self.account.address.toString())
+        self.SubscriptionStoragePath = StoragePath(identifier: identifier)!
+		self.SubscriptionPublicPath = PublicPath(identifier: identifier)!
+        self.handlerStoragePath = StoragePath(identifier: identifier)!
         emit ContractInitialized()
     }
 }
