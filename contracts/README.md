@@ -103,4 +103,30 @@ Remaining balance stays in the user’s fee pot for them to reclaim.
 
 This spec ensures users are protected by hard budget limits, fee integrity checks against contract updates, and a safe extension path that preserves remaining time while stacking new cycles.
 
+### Daily Registry Maintenance (Scheduled Job)
+
+Purpose: once per day, run a lightweight job that reconciles exactly one registry entry and self-schedules for the next day. There is no broad scan across multiple accounts.
+
+What it needs:
+- A dedicated maintenance handler implementing `{FlowTransactionScheduler.TransactionHandler}` with its own small FLOW fee pot (no user caps).
+- Self-scheduling parameters per run:
+  - `timestamp = getCurrentBlock().timestamp + 86400.0`
+  - `priority = Medium (1)`
+  - `executionEffort ≈ 500–1000` (very small since we touch one entry)
+  - `transactionData` (optional) holds a tiny cursor `{index}` within 100 bytes.
+- Before scheduling, call `FlowTransactionScheduler.estimate(...)` and assert fees within a small max-per-tx.
+
+Handler logic per run (single-entry update):
+1. Read `{index}` (default `0`).
+2. Lookup the address at `allSubscribers[index]` (or equivalent key order).
+3. Recompute `isActive` for that address from invariants (fee equality, cycles, expiry) and write it to the registry `{Address: {subscription: isActive}}`.
+4. Emit `SubscriptionStatusUpdated(address, isActive)` if the value changed.
+5. Compute `nextIndex = (index + 1) % allSubscribers.length`.
+6. Schedule the next run for `+86400.0` with `transactionData = {nextIndex}`.
+
+Why no scanning/pagination:
+- The registry already stores `isActive` per address; the handler touches exactly one entry per day to keep on-chain truth fresh without iterating large sets.
+- Single-entry updates keep computation predictable and cheap, avoiding any need to paginate or batch.
+- The 100-byte `transactionData` limit easily accommodates a tiny `{index}` cursor.
+
 

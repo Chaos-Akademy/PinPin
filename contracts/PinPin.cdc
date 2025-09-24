@@ -8,6 +8,7 @@ access(all) contract PinPin {
     // These contain actual values that are stored in the smart contract.
     // -----------------------------------------------------------------------
     access(all) var subscriptionFee: UFix64
+    access(self) var activeSubscriptions: {Address: }
     // Events
     access(all) event ContractInitialized()
     access(all) event SubscriptionActivated(subscriber: Address)
@@ -15,15 +16,16 @@ access(all) contract PinPin {
     /// Handler resource that implements the Scheduled Transaction interface
     access(all) resource Handler: FlowTransactionScheduler.TransactionHandler {
 
-        access(self) var vault: @FlowToken.Vault
+        access(self) var feeVault: @FlowToken.Vault
+        access(self) var receipts: @[FlowTransactionScheduler.ScheduledTransaction]
 
         access(FlowTransactionScheduler.Execute) fun executeTransaction(id: UInt64, data: AnyStruct?) {
             // Get PinPin's Flow vault ref
             let pinPinVault = PinPin.account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
             // Get a reference to the vaultCap
-            let ref <- self.vault.withdraw(amount: 0.1)
+            // let ref <- self.feeVault.withdraw(amount: 0.1)
             // Deposit 0 Flow on the PinPin account
-            pinPinVault.deposit(from: <- ref.withdraw(amount: 0.01)) 
+            pinPinVault.deposit(from: <- self.feeVault.withdraw(amount: 0.1)) 
             log("Account /self.owner!.address has made a deposit for a subscription")
             emit SubscriptionActivated(subscriber: self.owner!.address)
             // Determine delay for the next transaction (default 3 seconds if none provided)
@@ -52,13 +54,13 @@ access(all) contract PinPin {
             )   
 
             // Withdraw FLOW fees from this resource's ownner account vault
-            let fees <- ref.withdraw(amount: estimate.flowFee ?? 0.0) as! @FlowToken.Vault   
+            let fees <- self.feeVault.withdraw(amount: estimate.flowFee ?? 0.0) as! @FlowToken.Vault   
 
             // Issue a capability to the handler stored in this contract account
             let handlerCap = PinPin.account.capabilities.storage
                 .issue<auth(FlowTransactionScheduler.Execute) &{FlowTransactionScheduler.TransactionHandler}>(/storage/PinPin)
 
-            let receipt <- FlowTransactionScheduler.schedule(
+            let receipt: @FlowTransactionScheduler.ScheduledTransaction <- FlowTransactionScheduler.schedule(
                 handlerCap: handlerCap,
                 data: data,
                 timestamp: future,
@@ -77,7 +79,8 @@ access(all) contract PinPin {
                 PinPin.subscriptionFee == consentedFee: "Consented fee must be equal to contract's current fee"
                 vault.balance >= consentedCycles * consentedFee: "Vault's balance must be equal or greater than Fees x Cycles"
             }
-            self.vault <- vault
+            self.feeVault <- vault
+            self.receipts <- []
         }
     }
 
