@@ -26,6 +26,9 @@ access(all) contract PinPin {
     // -----------------------------------------------------------------------
     // PinPin contract-level Composite Type definitions
     // -----------------------------------------------------------------------
+
+    // Subscription resource
+    // This resource is used to store the subscription information
     access(all) resource Subscription {
         access(all) let subscriber: Address
         access(all) let fee: UFix64
@@ -39,6 +42,16 @@ access(all) contract PinPin {
             self.cycles = cycles
             self.startedAt = startedAt
             self.expiresAt = expiresAt
+        }
+    }
+    // Subscription manager
+    // This storage is used to store and manage the subscriptions
+    // inside a user's account
+    access(all) resource SubscriptionManager {
+        access(all) var subscriptions: @[Subscription]
+
+        init() {
+            self.subscriptions <- []
         }
     }
     // -----------------------------------------------------------------------
